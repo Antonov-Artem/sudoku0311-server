@@ -8,7 +8,7 @@ const bootstrap = async () => {
 
     app.use(cookieParser());
     app.enableCors({
-        origin: "http://localhost:5173",
+        origin: process.env.ALLOWED_ORIGIN,
         credentials: true,
     });
 

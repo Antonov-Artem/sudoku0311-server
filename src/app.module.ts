@@ -18,7 +18,10 @@ import { UsersModule } from "./users/users.module";
 
 @Module({
     imports: [
-        ConfigModule.forRoot({ isGlobal: true }),
+        ConfigModule.forRoot({
+            isGlobal: true,
+            envFilePath: [".env.development", ".env.production"],
+        }),
         ScheduleModule.forRoot(),
         AuthModule,
         UsersModule,

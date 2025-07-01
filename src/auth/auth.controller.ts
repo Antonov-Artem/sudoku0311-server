@@ -6,12 +6,15 @@ import {
     Response,
     UseGuards,
 } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 
 import { UsersService } from "../users/users.service";
 
 import { AuthService } from "./auth.service";
 import { JwtAuthGuard } from "./jwt-auth.guard";
 import { LocalAuthGuard } from "./local-auth.guard";
+
+const isProd = process.env.NODE_ENV === "production";
 
 @Controller("auth")
 export class AuthController {
@@ -40,14 +43,14 @@ export class AuthController {
 
         res.cookie("accessToken", tokens.accessToken, {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
+            secure: isProd,
+            sameSite: isProd ? "None" : "Lax",
             maxAge: 60 * 1000,
         });
         res.cookie("refreshToken", tokens.refreshToken, {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
+            secure: isProd,
+            sameSite: isProd ? "None" : "Lax",
             maxAge: 60 * 60 * 1000,
         });
 
@@ -65,8 +68,8 @@ export class AuthController {
 
         res.cookie("accessToken", tokens.accessToken, {
             httpOnly: true,
-            secure: false,
-            sameSite: "lax",
+            secure: isProd,
+            sameSite: isProd ? "None" : "Lax",
             maxAge: 60 * 1000,
         });
 
