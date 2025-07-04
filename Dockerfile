@@ -10,4 +10,6 @@ COPY . .
 
 RUN npm run build
 
-CMD ["node", "dist/main"]
+RUN npx prisma generate
+
+CMD npx prisma migrate deploy && node dist/main
