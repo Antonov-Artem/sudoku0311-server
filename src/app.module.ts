@@ -13,21 +13,19 @@ import { ProfileController } from "./profile/profile.controller";
 import { PurchaseModule } from "./purchase/purchase.module";
 import { ShopItemModule } from "./shop-item/shop-item.module";
 import { TaskModule } from "./task/task.module";
-import { UserProgressModule } from "./user-progress/user-progress.module";
 import { UsersModule } from "./users/users.module";
 
 @Module({
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
-            envFilePath: [".env.development", ".env.production"],
+            envFilePath: [".env", ".env.production"],
         }),
         ScheduleModule.forRoot(),
         AuthModule,
         UsersModule,
         PrismaModule,
         TaskModule,
-        UserProgressModule,
         ActivityRewardModule,
         InventoryModule,
         PurchaseModule,

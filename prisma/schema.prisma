@@ -1,9 +1,6 @@
-// =====================
-// Datasource & Generator
-// =====================
 datasource db {
-    provider = "sqlite"
-    url      = "file:./dev.db"
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -21,9 +18,7 @@ model User {
     gameSession        GameSession?
     inventory          Inventory?
     userTask           UserTask[]
-    userAchievement    UserAchievement[]
     userActivityReward UserActivityReward[]
-    userProgress       UserProgress?
 }
 
 model Profile {
@@ -153,9 +148,7 @@ model Reward {
     currencyId     String?
     currency       Currency?       @relation(fields: [currencyId], references: [id])
     quantity       Int
-    bannerReward   BannerReward?
     activityReward ActivityReward?
-    achievement    Achievement?
 }
 
 model ActivityReward {
@@ -174,52 +167,4 @@ model UserActivityReward {
     claimed          Boolean
 
     @@id([userId, activityRewardId])
-}
-
-model UserProgress {
-    id              String @id @default(uuid())
-    userId          String @unique
-    user            User   @relation(fields: [userId], references: [id])
-    levelsCompleted Int
-    energySpent     Int
-    bannersPulled   Int
-}
-
-model Banner {
-    id           String        @id @default(uuid())
-    name         String
-    description  String
-    imageUrl     String
-    isPremium    Boolean
-    bannerReward BannerReward?
-}
-
-model BannerReward {
-    bannerId String @unique()
-    banner   Banner @relation(fields: [bannerId], references: [id])
-    rewardId String @unique()
-    reward   Reward @relation(fields: [rewardId], references: [id])
-
-    @@id([bannerId, rewardId])
-}
-
-model Achievement {
-    id              String            @id @default(uuid())
-    name            String
-    rewardId        String            @unique()
-    reward          Reward            @relation(fields: [rewardId], references: [id])
-    description     String
-    userAchievement UserAchievement[]
-}
-
-model UserAchievement {
-    id            String      @id @default(uuid())
-    userId        String
-    user          User        @relation(fields: [userId], references: [id])
-    achievementId String
-    achievement   Achievement @relation(fields: [achievementId], references: [id])
-    achievedAt    DateTime    @default(now())
-    claimed       Boolean
-
-    @@unique([userId, achievementId])
 }
