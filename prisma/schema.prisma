@@ -1,0 +1,170 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id                 String               @id @default(cuid())
+    email              String               @unique
+    password           String
+    name               String
+    refreshToken       String?
+    profile            Profile?
+    balance            Balance?
+    gameSession        GameSession?
+    inventory          Inventory?
+    userTask           UserTask[]
+    userActivityReward UserActivityReward[]
+}
+
+model Profile {
+    id        String @id @default(uuid())
+    userId    String @unique
+    user      User   @relation(fields: [userId], references: [id])
+    avatarUrl String
+    level     Int
+}
+
+model Balance {
+    id             String @id @default(uuid())
+    userId         String @unique
+    user           User   @relation(fields: [userId], references: [id])
+    energy         Int // 0-300
+    gold           Int
+    gems           Int
+    activityPoints Int // 0-400
+}
+
+model Difficulty {
+    id          String        @id @default(uuid())
+    name        String
+    gameSession GameSession[]
+}
+
+model GameSession {
+    id           String     @id @default(uuid())
+    userId       String     @unique
+    user         User       @relation(fields: [userId], references: [id])
+    difficultyId String
+    difficulty   Difficulty @relation(fields: [difficultyId], references: [id])
+    board        String
+    score        Int
+    time         Int // in seconds
+    errors       Int
+}
+
+model Currency {
+    id     String   @id @default(uuid())
+    name   String
+    Reward Reward[]
+}
+
+model Rarity {
+    id   String @id @default(uuid())
+    name String
+    Item Item[]
+}
+
+model ItemCategory {
+    id   String @id @default(uuid())
+    name String
+    Item Item[]
+}
+
+model Item {
+    id             String          @id @default(uuid())
+    name           String
+    description    String
+    imageUrl       String
+    itemCategory   ItemCategory?   @relation(fields: [itemCategoryId], references: [id])
+    itemCategoryId String?
+    rarity         Rarity?         @relation(fields: [rarityId], references: [id])
+    rarityId       String?
+    inventoryItem  InventoryItem[]
+    shopItem       ShopItem?
+    reward         Reward[]
+}
+
+model Inventory {
+    id            String          @id @default(uuid())
+    userId        String          @unique()
+    user          User            @relation(fields: [userId], references: [id])
+    inventoryItem InventoryItem[]
+}
+
+model InventoryItem {
+    id          String    @id @default(uuid())
+    inventoryId String
+    inventory   Inventory @relation(fields: [inventoryId], references: [id])
+    itemId      String
+    item        Item      @relation(fields: [itemId], references: [id])
+    quantity    Int
+
+    @@unique([inventoryId, itemId])
+}
+
+model ShopItem {
+    id          String @id @default(uuid())
+    itemId      String @unique()
+    item        Item   @relation(fields: [itemId], references: [id])
+    priceInGold Int?
+    priceInGems Int?
+}
+
+model TaskType {
+    id   String @id @default(uuid())
+    name String
+}
+
+model Task {
+    id             String     @id @default(uuid())
+    type           String
+    description    String
+    goal           Int
+    activityPoints Int // 0-500
+    userTask       UserTask[]
+}
+
+model UserTask {
+    id       String  @id @default(uuid())
+    userId   String
+    user     User    @relation(fields: [userId], references: [id])
+    taskId   String
+    task     Task    @relation(fields: [taskId], references: [id])
+    progress Int // 0-goal
+    claimed  Boolean
+
+    @@unique([userId, taskId])
+}
+
+model Reward {
+    id             String          @id @default(uuid())
+    itemId         String?
+    item           Item?           @relation(fields: [itemId], references: [id])
+    currencyId     String?
+    currency       Currency?       @relation(fields: [currencyId], references: [id])
+    quantity       Int
+    activityReward ActivityReward?
+}
+
+model ActivityReward {
+    id                 String               @id @default(uuid())
+    activityPoints     Int
+    rewardId           String               @unique()
+    reward             Reward               @relation(fields: [rewardId], references: [id])
+    userActivityReward UserActivityReward[]
+}
+
+model UserActivityReward {
+    userId           String
+    user             User           @relation(fields: [userId], references: [id])
+    activityRewardId String
+    activityReward   ActivityReward @relation(fields: [activityRewardId], references: [id])
+    claimed          Boolean
+
+    @@id([userId, activityRewardId])
+}

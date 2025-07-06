@@ -1,0 +1,20 @@
+[
+    {
+        "type": "level_completion",
+        "description": "Пройти уровень",
+        "goal": 3,
+        "activityPoints": 200
+    },
+    {
+        "type": "energy_spent",
+        "description": "Потратить энергию",
+        "goal": 150,
+        "activityPoints": 200
+    },
+    {
+        "type": "banner_pulled",
+        "description": "Покрутить баннер",
+        "goal": 1,
+        "activityPoints": 200
+    }
+]
