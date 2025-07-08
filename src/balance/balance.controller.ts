@@ -20,9 +20,11 @@ export class BalanceController {
     @UseGuards(JwtAuthGuard)
     @Post("energy/spent")
     async spentEnergy(@Request() req) {
-        await this.prisma.balance.update({
-            where: { userId: req.user.userId },
-            data: { energy: { decrement: req.body.energy } },
-        });
+        await this.prisma.$executeRaw`
+            UPDATE "Balance"
+            SET "energy" = "energy" - ${req.body.energy}
+            WHERE "userId" = ${req.user.userId}
+            AND "energy" >= ${req.body.energy}
+        `;
     }
 }
