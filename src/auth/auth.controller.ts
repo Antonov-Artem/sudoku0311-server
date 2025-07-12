@@ -37,52 +37,41 @@ export class AuthController {
 
     @UseGuards(LocalAuthGuard)
     @Post("login")
-    async login(@Request() req, @Response() res) {
-        const tokens = await this.authService.login(req.user);
+    async login(
+        @Body("email") email: string,
+        @Body("password") password: string,
+    ) {
+        const tokens = await this.authService.login(email, password);
 
-        res.cookie("accessToken", tokens.accessToken, {
-            httpOnly: true,
-            secure: isProd,
-            sameSite: isProd ? "None" : "Lax",
-            maxAge: 60 * 1000,
-        });
-        res.cookie("refreshToken", tokens.refreshToken, {
-            httpOnly: true,
-            secure: isProd,
-            sameSite: isProd ? "None" : "Lax",
-            maxAge: 60 * 60 * 1000,
-        });
+        if (!tokens) return;
 
-        res.json({ userId: tokens.userId });
+        return {
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
+            userId: tokens.userId,
+        };
     }
 
     @Post("refresh")
-    async refresh(@Request() req, @Response() res) {
-        const { userId } = req.body;
-        const refreshToken = req.cookies.refreshToken;
+    async refresh(@Request() req) {
+        const { userId, refreshToken } = req.body;
+
         const tokens = await this.authService.refreshAccessToken(
             userId,
             refreshToken,
         );
 
-        res.cookie("accessToken", tokens.accessToken, {
-            httpOnly: true,
-            secure: isProd,
-            sameSite: isProd ? "None" : "Lax",
-            maxAge: 60 * 1000,
-        });
-
-        res.json({ userId: tokens.userId });
+        return {
+            accessToken: tokens.accessToken,
+            refreshToken: refreshToken,
+            userId: tokens.userId,
+        };
     }
 
     @UseGuards(JwtAuthGuard)
     @Post("logout")
-    async logout(@Request() req, @Response() res) {
+    async logout(@Request() req) {
         await this.usersService.setRefreshToken(req.user.userId, null);
-
-        res.clearCookie("accessToken");
-        res.clearCookie("refreshToken");
-
-        res.json({ message: "Logged out" });
+        return { message: "Logged out" };
     }
 }
