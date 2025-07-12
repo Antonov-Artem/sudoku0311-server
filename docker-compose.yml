@@ -19,6 +19,7 @@ services:
         restart: always
         container_name: app
         environment:
+            APP_PORT: ${APP_PORT}
             ALLOWED_ORIGIN: ${ALLOWED_ORIGIN}
             JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
             JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
